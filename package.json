@@ -1,0 +1,17 @@
+{
+  "name": "mirror-image",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.12.13",
+    "electron": "^30.0.9",
+    "electron-builder": "^24.13.3"
+  }
+}

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <script defer src="render.js"></script>
+    <title>Mirror Image</title>
+</head>
+<body>
+    <div class="container">
+        <section class="main-content">
+            <h2>Let's Dig Up Those Duplicate Photos</h2>
+            <p>Choose the location/folder where you want to find duplicate photos. This can be anything from a small photo folder to your entire computer!</p>
+
+            <div class="button-container">
+                <button id="locationButton">Choose Location</button>
+            </div>
+
+            <div class="box-container" id="boxContainer" style="display: none;">
+                <div class="box" id="box1">
+                    <div class="box-title">Selected Folder</div>
+                    <div class="box-content" id="selectedDir"></div>
+                </div>
+                <div class="box" id="box2">
+                    <button id="findButton">FIND!</button>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
