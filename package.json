@@ -4,7 +4,25 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.kaidenong.mirrorimage",
+    "productName": "Mirror Image",
+    "directories": {
+      "output": "mirror-image"
+    },
+    "win": {
+      "icon": "build/logo.ico"
+    },
+    "mac": {
+      "icon": "assets/logo.png"
+    },
+    "linux": {
+      "icon": "build/logo.png"
+    }
   },
   "keywords": [],
   "author": "",
