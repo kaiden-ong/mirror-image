@@ -5,6 +5,7 @@ app.whenReady().then(() => {
     const myWindow = new BrowserWindow({
         width: 900,
         height: 600,
+        icon: path.join(__dirname, '/assets/logo.png'),
         webPreferences: {
             nodeIntegration: true,
             enableRemoteModule: true,

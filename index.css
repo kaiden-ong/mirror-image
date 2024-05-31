@@ -16,37 +16,41 @@ body {
 }
 
 .container {
-    max-width: 800px;
+    max-width: 600px;
     width: 100%;
     padding: 20px;
 }
 
 .main-content {
     background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     padding: 20px;
     text-align: center;
 }
 
 h2 {
     color: #333;
-    font-size: 24px;
-    margin-bottom: 10px;
+    font-size: 28px;
+    margin: 15px 0;
 }
 
 p {
     color: #666;
     font-size: 16px;
-    line-height: 1.5;
-}
-
-.button-container {
     margin: 20px 0;
 }
 
+.button-container {
+    padding: 0 0 20px 0;
+}
+
+.button-container img {
+    height: 1.25rem;
+}
+
 .button-container button {
-    padding: 10px 20px;
+    padding: 12px 24px;
     font-size: 16px;
     background-color: #007bff;
     color: #fff;
@@ -62,17 +66,19 @@ p {
 
 .box-container {
     display: flex;
-    justify-content: space-between;
-    gap: 20px;
+    flex-direction: column;
+    align-items: center;
+    border: 2px solid #ccc;
+    border-radius: 8px;
 }
 
 .box {
-    flex: 1;
-    padding: 20px;
+    width: 100%;
+    padding: 20px 20px 0 20px;
     background-color: #fff;
-    border-radius: 5px;
+    border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    overflow-y: auto;
+    text-align: left;
 }
 
 .box-title {
@@ -85,26 +91,23 @@ p {
     color: #666;
     font-size: 16px;
     line-height: 1.5;
+    word-break: break-all; /* Ensure long paths are handled gracefully */
 }
 
 #findButton {
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
+    width: 125px;
+    height: 40px;
+    background-image: url("./assets/logo-text.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: 2px solid black;
     cursor: pointer;
-    font-size: 16px;
-    border-radius: 5px;
+    border-radius: 15px;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     transition: background-color 0.3s;
-}
-
-#findButton:hover {
-    background-color: #45a049;
-}
-
-/* Responsive styles */
-@media screen and (max-width: 768px) {
-    .box-container {
-        flex-direction: column;
-    }
+    margin-bottom: 20px;
 }
