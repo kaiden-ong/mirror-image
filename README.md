@@ -1,4 +1,5 @@
 # Mirror Image
 
-## Need to find your duplicate photos, well look no further!!
-Install Mirror Image here: <a href="/mirror-image.zip" download>Click to Download</a>
+## Looking to clean up your photo collection? Mirror Image helps you find and manage duplicate photos quickly and easily!
+
+[Download Mirror Image](mirror-image.zip)
