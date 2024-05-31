@@ -12,13 +12,13 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
 }
 
 .container {
     max-width: 600px;
     width: 100%;
     padding: 20px;
+    overflow-y: auto;
 }
 
 .main-content {
@@ -110,4 +110,44 @@ p {
     align-items: center;
     transition: background-color 0.3s;
     margin-bottom: 20px;
+}
+
+.dup-cards {
+    gap: 20px;
+}
+
+.dup-card {
+    width: 80%;
+    border-radius: 15px;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.img-paths {
+    font-size: small;
+    cursor: pointer;
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.view-button {
+    padding: 6px 18px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.view-button:hover {
+    background-color: #0056b3;
 }
