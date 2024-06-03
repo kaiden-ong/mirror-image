@@ -15,7 +15,7 @@ app.whenReady().then(() => {
 
     myWindow.removeMenu()
     myWindow.loadFile('index.html');
-    myWindow.webContents.openDevTools();
+    // myWindow.webContents.openDevTools();
 
     ipcMain.on('select-dirs', async (event, path) => {
         const result = await dialog.showOpenDialog(myWindow, {
