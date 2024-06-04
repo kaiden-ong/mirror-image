@@ -1,6 +1,8 @@
 const { ipcRenderer, shell } = require('electron');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+var Walk = require("@root/walk");
 
 const setDirBtn = document.getElementById('locationButton');
 const boxContainer = document.getElementById('boxContainer');
@@ -19,35 +21,95 @@ ipcRenderer.on('selected-directory', (event, paths) => {
     boxContainer.style.display = 'flex';
 });
 
-findBtn.addEventListener('click', () => {
+findBtn.addEventListener('click', async () => {
+    console.log("clicked")
 	imgMap = {}
     const dirToSearch = selectedDirElement.textContent.trim();
-    const files = fs.readdirSync(dirToSearch);
-
-    files.forEach(file => {
-        const ext = file.split('.').pop();
-        if (imgFileTypes.includes(`.${ext.toLowerCase()}`)) {
-			const filePath = path.join(dirToSearch, file);
-            const hash = getFileHash(filePath);
-
-            if (imgMap[hash]) {
-                imgMap[hash].push(filePath);
-            } else {
-                imgMap[hash] = [filePath];
-            }
-        }
-    });
+    await Walk.walk(dirToSearch, walkFunc).then(function () {
+        console.log("Done");
+      });
+    // findDuplicates(dirToSearch)
 	displayNumDuplicates();
     displayDuplicates();
 });
 
+async function walkFunc(err, pathname, dirent) {
+    if (err) {
+      return false;
+    }
+    if (!dirent.isDirectory() && !dirent.name.startsWith('.') && !dirent.name.startsWith('$')) {
+        console.log(pathname)
+        const ext = path.extname(pathname).toLowerCase();
+        if (imgFileTypes.includes(ext) && fileLocal(pathname)) {
+            const hash = getFileHash(pathname);
+            if (hash) {
+                if (imgMap[hash]) {
+                    imgMap[hash].push(pathname);
+                } else {
+                    imgMap[hash] = [pathname];
+                }
+            }
+        }
+    }
+}
+
+// function findDuplicates(directory) {
+//     fs.readdir(directory, function(err, list) {
+//         list.forEach(file => {
+//             if(! /^\..*/.test(file)) {
+                // const fullPath = path.join(directory, file);
+                // if (isDir(fullPath)) {
+                //     findDuplicates(fullPath);
+                // } else {
+                //     const ext = path.extname(file).toLowerCase();
+                //     if (imgFileTypes.includes(ext) && fileLocal(fullPath)) {
+                //         const hash = getFileHash(fullPath);
+                //         if (hash) {
+                //             if (imgMap[hash]) {
+                //                 imgMap[hash].push(fullPath);
+                //             } else {
+                //                 imgMap[hash] = [fullPath];
+                //             }
+                //         }
+                //     }
+                // }
+//                 console.log(file)
+//             }
+//         });
+//     });
+// }
+
+function fileLocal(filePath) {
+    try {
+        const stats = fs.statSync(filePath);
+        if (stats.blocks === 0) {
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.error(`Error checking file attributes: ${filePath}`, error);
+        return false;
+    }
+}
+
+function isDir(path) {
+    try {
+        const stat = fs.lstatSync(path);
+        return stat.isDirectory();
+    } catch (e) {
+        console.error(`Error reading path: ${path}`, e);
+        return false;
+    }
+}
+
 function getFileHash(filePath) {
 	try {
 		const fileBuffer = fs.readFileSync(filePath);
-		const hash = require('crypto').createHash('md5').update(fileBuffer).digest('hex');
+		const hash = crypto.createHash('md5').update(fileBuffer).digest('hex');
 		return hash;
 	} catch (error) {
 		console.log("Error:", error)
+        return null;
 	}	
 }
 
