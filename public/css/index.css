@@ -11,6 +11,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    min-height: 100vh;
 }
 
 .container {
@@ -97,7 +98,7 @@ p {
 #findButton {
     width: 125px;
     height: 40px;
-    background-image: url("./assets/logo-text.png");
+    background-image: url("../assets/logo-text.png");
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;

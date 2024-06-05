@@ -5,7 +5,7 @@ app.whenReady().then(() => {
     const myWindow = new BrowserWindow({
         width: 900,
         height: 600,
-        icon: path.join(__dirname, '/assets/logo.png'),
+        icon: path.join(__dirname, 'public/assets/logo.png'),
         webPreferences: {
             nodeIntegration: true,
             enableRemoteModule: true,
@@ -15,7 +15,7 @@ app.whenReady().then(() => {
 
     myWindow.removeMenu()
     myWindow.loadFile('index.html');
-    // myWindow.webContents.openDevTools();
+    myWindow.webContents.openDevTools();    
 
     ipcMain.on('select-dirs', async (event, path) => {
         const result = await dialog.showOpenDialog(myWindow, {

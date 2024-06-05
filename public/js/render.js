@@ -19,6 +19,9 @@ setDirBtn.addEventListener('click', () => {
 ipcRenderer.on('selected-directory', (event, paths) => {
     selectedDirElement.innerHTML = `<p>${paths}</p>`;
     boxContainer.style.display = 'flex';
+    imgMap = {};
+    // displayDuplicates();
+    // hideNumDup();
 });
 
 findBtn.addEventListener('click', async () => {
@@ -27,10 +30,11 @@ findBtn.addEventListener('click', async () => {
     const dirToSearch = selectedDirElement.textContent.trim();
     await Walk.walk(dirToSearch, walkFunc).then(function () {
         console.log("Done");
-      });
+    });
     // findDuplicates(dirToSearch)
-	displayNumDuplicates();
-    displayDuplicates();
+    const duplicates = Object.values(imgMap).filter(paths => paths.length > 1);
+    localStorage.setItem('dups', JSON.stringify(duplicates));
+    window.location.href = 'public/components/duplicate-img.html';
 });
 
 async function walkFunc(err, pathname, dirent) {
@@ -92,16 +96,6 @@ function fileLocal(filePath) {
     }
 }
 
-function isDir(path) {
-    try {
-        const stat = fs.lstatSync(path);
-        return stat.isDirectory();
-    } catch (e) {
-        console.error(`Error reading path: ${path}`, e);
-        return false;
-    }
-}
-
 function getFileHash(filePath) {
 	try {
 		const fileBuffer = fs.readFileSync(filePath);
@@ -113,48 +107,50 @@ function getFileHash(filePath) {
 	}	
 }
 
-function displayDuplicates() {
-    const duplicates = Object.values(imgMap).filter(paths => paths.length > 1);
-	console.log(duplicates);
-    const dupCardsContainer = document.querySelector('.dup-cards');
-    dupCardsContainer.innerHTML = '';
+// TODO: Use this code to create a page that shows all at once, so that we can delete more quickly
 
-    duplicates.forEach(paths => {
-        const card = document.createElement('div');
-        card.classList.add('dup-card');
-		card.style.border = '1px solid #ccc';
+// function displayDuplicates() {
+//     const duplicates = Object.values(imgMap).filter(paths => paths.length > 1);
+// 	console.log(duplicates);
+//     const dupCardsContainer = document.querySelector('.dup-cards');
+//     dupCardsContainer.innerHTML = '';
 
-		paths.forEach(filePath => {
-			const imgPath = document.createElement('p');
-            imgPath.textContent = filePath;
-			imgPath.className = "img-paths";
-			imgPath.addEventListener('click', () => openPath(filePath));
-            card.appendChild(imgPath);
-        });
+//     duplicates.forEach(paths => {
+//         const card = document.createElement('div');
+//         card.classList.add('dup-card');
+// 		card.style.border = '1px solid #ccc';
 
-		const viewButton = document.createElement('button');
-        viewButton.textContent = 'View Image';
-        viewButton.className = 'view-button';
-		viewButton.addEventListener('click', () => showImage(paths[0]));
-        card.appendChild(viewButton);
+// 		paths.forEach(filePath => {
+// 			const imgPath = document.createElement('p');
+//             imgPath.textContent = filePath;
+// 			imgPath.className = "img-paths";
+// 			imgPath.addEventListener('click', () => openPath(filePath));
+//             card.appendChild(imgPath);
+//         });
 
-        dupCardsContainer.appendChild(card);
-    });
-}
+// 		const viewButton = document.createElement('button');
+//         viewButton.textContent = 'View Image';
+//         viewButton.className = 'view-button';
+// 		viewButton.addEventListener('click', () => showImage(paths[0]));
+//         card.appendChild(viewButton);
 
-function displayNumDuplicates() {
-	const numDupsDiv = document.querySelector(".num-dups");
-	const duplicates = Object.values(imgMap).filter(paths => paths.length > 1);
-	const numDups = duplicates.length
-	numDupsDiv.innerText = "Sets of duplicates images remaining: " + numDups
-}
+//         dupCardsContainer.appendChild(card);
+//     });
+// }
 
-function showImage(filePath) {
-    console.log("Showing image:", filePath);
-    window.open(filePath);
-}
+// function displayNumDuplicates() {
+//     const numDupsDiv = document.querySelector(".num-dups");
+// 	const duplicates = Object.values(imgMap).filter(paths => paths.length > 1);
+// 	const numDups = duplicates.length
+// 	numDupsDiv.innerText = "Sets of duplicates images remaining: " + numDups
+// }
 
-function openPath(filePath) {
-	console.log("Opening image path:", filePath);
-	shell.showItemInFolder(filePath); 
-}
+// function showImage(filePath) {
+//     console.log("Showing image:", filePath);
+//     window.open(filePath);
+// }
+
+// function openPath(filePath) {
+// 	console.log("Opening image path:", filePath);
+// 	shell.showItemInFolder(filePath); 
+// }
