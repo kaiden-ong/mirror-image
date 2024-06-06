@@ -18,7 +18,7 @@
       "icon": "build/logo.ico"
     },
     "mac": {
-      "icon": "assets/logo.png"
+      "icon": "build/logo.png"
     },
     "linux": {
       "icon": "build/logo.png"
