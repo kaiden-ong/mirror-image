@@ -46,10 +46,17 @@ body {
 }
 
 #next-img-btn, #finish-btn {
-    padding: 5px;
-    border-radius: 15px;
+    padding: 10px;
+    border-radius: 10px;
     border: 2px solid #000;
+    transition: background-color 0.3s ease, border 0.3s ease, color 0.3s ease;
     cursor: pointer;
+}
+
+#next-img-btn:hover, #finish-btn:hover {
+    background-color: #0056b3;
+    color: white;
+    border: 2px solid #0056b3;
 }
 
 h2 {
