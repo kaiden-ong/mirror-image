@@ -33,6 +33,7 @@
     "electron-builder": "^24.13.3"
   },
   "dependencies": {
-    "@root/walk": "^1.1.0"
+    "@root/walk": "^1.1.0",
+    "fast-folder-size": "^2.2.0"
   }
 }

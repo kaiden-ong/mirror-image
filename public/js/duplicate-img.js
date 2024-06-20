@@ -6,6 +6,7 @@ const backBtn = document.getElementById("back-btn");
 const nextBtn = document.getElementById("next-img-btn");
 const numDupsDiv = document.querySelector(".num-dups");
 const finishBtn = document.getElementById("finish-btn");
+const toggleCheckbox = document.getElementById('toggle-checkbox');
 
 let dups = {};
 
@@ -34,6 +35,12 @@ nextBtn.addEventListener('click', () => {
 finishBtn.addEventListener('click', () => {
     window.location.href = '../../index.html';
 })
+
+// todo
+toggleCheckbox.addEventListener('change', function() {
+    const isChecked = this.checked;
+    console.log(`Toggle is now ${isChecked ? 'ON' : 'OFF'}`);
+});
 
 function displayDuplicates() {
 	console.log(dups);

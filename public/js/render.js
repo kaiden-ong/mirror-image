@@ -3,6 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 var Walk = require("@root/walk");
+const { dir } = require('console');
+const fastFolderSize = require('fast-folder-size')
 
 const setDirBtn = document.getElementById('locationButton');
 const boxContainer = document.getElementById('boxContainer');
@@ -11,10 +13,38 @@ const findBtn = document.getElementById('findButton');
 const imgFileTypes = ['.jpeg', '.jpg', '.png', '.gif', '.bmp', '.tiff', '.tif', '.svg', '.webp',
     '.heif', '.heic', '.cr2', '.nef', '.arw', '.orf', '.rw2', '.psd', '.ico', '.eps', '.pdf', '.ai', '.kra'];
 let imgMap = {};
-let totalImg = 0;
+let totalImg = 0; 
 const title = document.getElementById("home-title");
 const subtitle = document.getElementById("home-subtitle");
 const loadingSpinner = document.getElementById("loadingSpinner");
+var dirSize = 0;
+
+class Queue {
+    constructor() {
+        this.items = {}
+        this.frontIndex = 0
+        this.backIndex = 0
+    }
+    enqueue(item) {
+        this.items[this.backIndex] = item
+        this.backIndex++
+        return item + ' inserted'
+    }
+    dequeue() {
+        const item = this.items[this.frontIndex]
+        delete this.items[this.frontIndex]
+        this.frontIndex++
+        return item
+    }
+    peek() {
+        return this.items[this.frontIndex]
+    }
+    get printQueue() {
+        return this.items;
+    }
+}
+
+const q = new Queue();
 
 setDirBtn.addEventListener('click', () => {
 	ipcRenderer.send('select-dirs');
@@ -24,12 +54,18 @@ ipcRenderer.on('selected-directory', (event, paths) => {
     selectedDirElement.innerHTML = `<p>${paths}</p>`;
     boxContainer.style.display = 'flex';
     imgMap = {};
+    fastFolderSize(paths, (err, bytes) => {
+        if (err) {
+          throw err;
+        }
+        dirSize = bytes;
+    })
     // displayDuplicates();
     // hideNumDup();
 });
 
 findBtn.addEventListener('click', async () => {
-    console.log("clicked")
+    console.log("clicked", dirSize)
 	imgMap = {}
     const dirToSearch = selectedDirElement.textContent.trim();
     loading();
@@ -71,6 +107,7 @@ async function walkFunc(err, pathname, dirent) {
         const ext = path.extname(pathname).toLowerCase();
         if (imgFileTypes.includes(ext) && fileLocal(pathname)) {
             totalImg++;
+            // q.enqueue()
             title.innerText = `Images checked: ${totalImg}\nDuplicates found: ${(Object.values(imgMap).filter(paths => paths.length > 1)).length}`;
             const hash = getFileHash(pathname);
             if (hash) {
