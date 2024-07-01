@@ -9,7 +9,8 @@ app.whenReady().then(() => {
         webPreferences: {
             nodeIntegration: true,
             enableRemoteModule: true,
-            contextIsolation: false
+            contextIsolation: false,
+            nodeIntegrationInWorker: true
         }
     });
 

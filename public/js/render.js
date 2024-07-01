@@ -2,14 +2,15 @@ const { ipcRenderer, shell } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-var Walk = require("@root/walk");
-const { dir } = require('console');
+const { Worker } = require('worker_threads');
 const fastFolderSize = require('fast-folder-size')
+const Walk = require('@root/walk');
 
 const setDirBtn = document.getElementById('locationButton');
 const boxContainer = document.getElementById('boxContainer');
 const selectedDirElement = document.getElementById('selectedDir');
 const findBtn = document.getElementById('findButton');
+const viewDupsBtn = document.getElementById('viewDupsBtn');
 const imgFileTypes = ['.jpeg', '.jpg', '.png', '.gif', '.bmp', '.tiff', '.tif', '.svg', '.webp',
     '.heif', '.heic', '.cr2', '.nef', '.arw', '.orf', '.rw2', '.psd', '.ico', '.eps', '.pdf', '.ai', '.kra'];
 let imgMap = {};
@@ -17,7 +18,8 @@ let totalImg = 0;
 const title = document.getElementById("home-title");
 const subtitle = document.getElementById("home-subtitle");
 const loadingSpinner = document.getElementById("loadingSpinner");
-var dirSize = 0;
+let dirSize = 0;
+let openQ = false;
 
 class Queue {
     constructor() {
@@ -38,6 +40,9 @@ class Queue {
     }
     peek() {
         return this.items[this.frontIndex]
+    }
+    isEmpty() {
+        return this.frontIndex === this.backIndex;
     }
     get printQueue() {
         return this.items;
@@ -72,6 +77,7 @@ findBtn.addEventListener('click', async () => {
     await Walk.walk(dirToSearch, walkFunc).then(function () {
         console.log("Done");
     });
+    hash();
     // findDuplicates(dirToSearch)
     const duplicates = Object.values(imgMap).filter(paths => paths.length > 1);
     localStorage.setItem('dups', JSON.stringify(duplicates));
@@ -79,9 +85,12 @@ findBtn.addEventListener('click', async () => {
     document.getElementById("loadingText").style.color = "green";
     document.querySelector(".spinner").style.display = 'none';
     document.querySelector(".checkmark").style.display = 'flex';
-    await delay(2000);
-    window.location.href = 'public/components/duplicate-img.html';
+    document.querySelector(".view-dups-container").style.display = 'flex';
 });
+
+viewDupsBtn.addEventListener('click', () => {
+    window.location.href = 'public/components/duplicate-img.html';
+})
 
 async function loading() {
     const btnContainer = document.querySelector(".button-container");
@@ -107,45 +116,29 @@ async function walkFunc(err, pathname, dirent) {
         const ext = path.extname(pathname).toLowerCase();
         if (imgFileTypes.includes(ext) && fileLocal(pathname)) {
             totalImg++;
-            // q.enqueue()
-            title.innerText = `Images checked: ${totalImg}\nDuplicates found: ${(Object.values(imgMap).filter(paths => paths.length > 1)).length}`;
-            const hash = getFileHash(pathname);
-            if (hash) {
-                if (imgMap[hash]) {
-                    imgMap[hash].push(pathname);
-                } else {
-                    imgMap[hash] = [pathname];
-                }
-            }
+            q.enqueue(pathname);
         }
     }
 }
 
-// function findDuplicates(directory) {
-//     fs.readdir(directory, function(err, list) {
-//         list.forEach(file => {
-//             if(! /^\..*/.test(file)) {
-                // const fullPath = path.join(directory, file);
-                // if (isDir(fullPath)) {
-                //     findDuplicates(fullPath);
-                // } else {
-                //     const ext = path.extname(file).toLowerCase();
-                //     if (imgFileTypes.includes(ext) && fileLocal(fullPath)) {
-                //         const hash = getFileHash(fullPath);
-                //         if (hash) {
-                //             if (imgMap[hash]) {
-                //                 imgMap[hash].push(fullPath);
-                //             } else {
-                //                 imgMap[hash] = [fullPath];
-                //             }
-                //         }
-                //     }
-                // }
-//                 console.log(file)
-//             }
-//         });
-//     });
-// }
+async function hash() {
+    while (!q.isEmpty()) {
+        // if (q.isEmpty()) {
+        //     continue;
+        // }
+        title.innerText = `Images checked: ${totalImg}\nDuplicates found: ${(Object.values(imgMap).filter(paths => paths.length > 1)).length}`;
+        const pathname = q.dequeue();
+        console.log(pathname)
+        const hash = getFileHash(pathname);
+        if (hash) {
+            if (imgMap[hash]) {
+                imgMap[hash].push(pathname);
+            } else {
+                imgMap[hash] = [pathname];
+            }
+        }
+    }
+}
 
 function fileLocal(filePath) {
     try {
