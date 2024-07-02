@@ -19,6 +19,7 @@ const subtitle = document.getElementById("home-subtitle");
 const loadingSpinner = document.getElementById("loadingSpinner");
 let dirSize = 0;
 let openQ = false;
+let arr = [];
 
 class Queue {
     constructor() {
@@ -68,23 +69,23 @@ ipcRenderer.on('selected-directory', (event, paths) => {
     // hideNumDup();
 });
 
-findBtn.addEventListener('click', async () => {
-    console.log("clicked", dirSize)
-	imgMap = {}
-    const dirToSearch = selectedDirElement.textContent.trim();
-    loading();
-    await Walk.walk(dirToSearch, walkFunc).then(function () {
-        console.log("Done");
-    });
-    hash();
-    // findDuplicates(dirToSearch)
-    const duplicates = Object.values(imgMap).filter(paths => paths.length > 1);
+ipcRenderer.on('hash-complete', (event, duplicates) => {
+    title.innerText = `Images checked: ${totalImg}\nDuplicates found: ${duplicates.length}`;
     localStorage.setItem('dups', JSON.stringify(duplicates));
     document.getElementById("loadingText").innerText = "Check complete!";
     document.getElementById("loadingText").style.color = "green";
     document.querySelector(".spinner").style.display = 'none';
     document.querySelector(".checkmark").style.display = 'flex';
     document.querySelector(".view-dups-container").style.display = 'flex';
+});
+
+findBtn.addEventListener('click', async () => {
+    const dirToSearch = selectedDirElement.textContent.trim();
+    loading();
+    await Walk.walk(dirToSearch, walkFunc).then(function () {
+        ipcRenderer.send("list-complete", arr);
+    });
+    // findDuplicates(dirToSearch)
 });
 
 viewDupsBtn.addEventListener('click', () => {
@@ -100,41 +101,22 @@ async function loading() {
     loadingSpinner.style.display = 'flex';
 }
 
-function delay(milliseconds){
-    return new Promise(resolve => {
-        setTimeout(resolve, milliseconds);
-    });
-}
+// function delay(milliseconds){
+//     return new Promise(resolve => {
+//         setTimeout(resolve, milliseconds);
+//     });
+// }
 
 async function walkFunc(err, pathname, dirent) {
     if (err) {
       return false;
     }
     if (!dirent.isDirectory() && !dirent.name.startsWith('.') && !dirent.name.startsWith('$')) {
-        console.log(pathname)
         const ext = path.extname(pathname).toLowerCase();
         if (imgFileTypes.includes(ext) && fileLocal(pathname)) {
             totalImg++;
             q.enqueue(pathname);
-        }
-    }
-}
-
-async function hash() {
-    while (!q.isEmpty()) {
-        // if (q.isEmpty()) {
-        //     continue;
-        // }
-        title.innerText = `Images checked: ${totalImg}\nDuplicates found: ${(Object.values(imgMap).filter(paths => paths.length > 1)).length}`;
-        const pathname = q.dequeue();
-        console.log(pathname)
-        const hash = getFileHash(pathname);
-        if (hash) {
-            if (imgMap[hash]) {
-                imgMap[hash].push(pathname);
-            } else {
-                imgMap[hash] = [pathname];
-            }
+            arr.push(pathname);
         }
     }
 }

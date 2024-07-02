@@ -42,8 +42,12 @@ app.whenReady().then(() => {
         }
     })
 
-    ipcMain.on('message-from-worker', async (event, arg) => {
-        console.log("Message received from worker:", arg);
+    ipcMain.on('hash-complete', (event, arg) => {
+        myWindow.webContents.send('hash-complete', arg)
+    });
+
+    ipcMain.on('list-complete', (event, arg) => {
+        workerWindow.webContents.send('list-complete', arg)
     });
 });
 

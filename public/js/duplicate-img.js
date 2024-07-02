@@ -58,11 +58,16 @@ function displayDuplicates() {
         card.appendChild(imgPath);
     });
 
-    const viewButton = document.createElement('button');
-    viewButton.textContent = 'View Image';
-    viewButton.className = 'view-button';
-    viewButton.addEventListener('click', () => showImage(dups[0][0]));
-    card.appendChild(viewButton);
+    // const viewButton = document.createElement('button');
+    // viewButton.textContent = 'View Image';
+    // viewButton.className = 'view-button';
+    // viewButton.addEventListener('click', () => showImage(dups[0][0]));
+    // card.appendChild(viewButton);
+    const imgThumbnail = document.createElement('img');
+    imgThumbnail.src = dups[0][0];
+    imgThumbnail.className = 'img-thumbnail';
+    imgThumbnail.addEventListener('click', () => showImage(dups[0][0]));
+    card.appendChild(imgThumbnail);
 
     dupCardsContainer.appendChild(card);
 }
