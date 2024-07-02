@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>I'm a hidden worker</title>
+  </head>
+  <body>
+    <script>
+      console.log("Worker script running");
+      const { ipcRenderer } = require('electron');
+      ipcRenderer.send('message-from-worker', "worker working");
+    </script>
+  </body>
+</html>

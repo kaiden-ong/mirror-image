@@ -1,22 +1,37 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 
+let myWindow, workerWindow;
+
 app.whenReady().then(() => {
-    const myWindow = new BrowserWindow({
+    myWindow = new BrowserWindow({
         width: 900,
         height: 600,
         icon: path.join(__dirname, 'public/assets/logo.png'),
         webPreferences: {
             nodeIntegration: true,
             enableRemoteModule: true,
-            contextIsolation: false,
-            nodeIntegrationInWorker: true
+            contextIsolation: false
         }
     });
 
     myWindow.removeMenu()
     myWindow.loadFile('index.html');
     myWindow.webContents.openDevTools();    
+
+    // create hidden worker window
+    workerWindow = new BrowserWindow({
+        show: false,
+        webPreferences: {
+            nodeIntegration: true,
+            enableRemoteModule: true,
+            contextIsolation: false
+        }
+    });
+
+    workerWindow.removeMenu()
+    workerWindow.loadFile('worker.html');
+    workerWindow.webContents.openDevTools();  
 
     ipcMain.on('select-dirs', async (event, path) => {
         const result = await dialog.showOpenDialog(myWindow, {
@@ -26,6 +41,10 @@ app.whenReady().then(() => {
             event.reply('selected-directory', result.filePaths[0]);
         }
     })
+
+    ipcMain.on('message-from-worker', async (event, arg) => {
+        console.log("Message received from worker:", arg);
+    });
 });
 
 app.on('window-all-closed', () => {

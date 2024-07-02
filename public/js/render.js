@@ -2,7 +2,6 @@ const { ipcRenderer, shell } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { Worker } = require('worker_threads');
 const fastFolderSize = require('fast-folder-size')
 const Walk = require('@root/walk');
 
