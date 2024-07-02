@@ -20,18 +20,18 @@ app.whenReady().then(() => {
     myWindow.webContents.openDevTools();    
 
     // create hidden worker window
-    workerWindow = new BrowserWindow({
-        show: false,
-        webPreferences: {
-            nodeIntegration: true,
-            enableRemoteModule: true,
-            contextIsolation: false
-        }
-    });
+    // workerWindow = new BrowserWindow({
+    //     show: false,
+    //     webPreferences: {
+    //         nodeIntegration: true,
+    //         enableRemoteModule: true,
+    //         contextIsolation: false
+    //     }
+    // });
 
-    workerWindow.removeMenu()
-    workerWindow.loadFile('worker.html');
-    workerWindow.webContents.openDevTools();  
+    // workerWindow.removeMenu()
+    // workerWindow.loadFile('worker.html');
+    // workerWindow.webContents.openDevTools();  
 
     ipcMain.on('select-dirs', async (event, path) => {
         const result = await dialog.showOpenDialog(myWindow, {
@@ -41,14 +41,6 @@ app.whenReady().then(() => {
             event.reply('selected-directory', result.filePaths[0]);
         }
     })
-
-    ipcMain.on('hash-complete', (event, arg) => {
-        myWindow.webContents.send('hash-complete', arg)
-    });
-
-    ipcMain.on('list-complete', (event, arg) => {
-        workerWindow.webContents.send('list-complete', arg)
-    });
 });
 
 app.on('window-all-closed', () => {

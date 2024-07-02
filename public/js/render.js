@@ -2,8 +2,7 @@ const { ipcRenderer, shell } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const fastFolderSize = require('fast-folder-size')
-const Walk = require('@root/walk');
+var Walk = require("@root/walk");
 
 const setDirBtn = document.getElementById('locationButton');
 const boxContainer = document.getElementById('boxContainer');
@@ -13,43 +12,10 @@ const viewDupsBtn = document.getElementById('viewDupsBtn');
 const imgFileTypes = ['.jpeg', '.jpg', '.png', '.gif', '.bmp', '.tiff', '.tif', '.svg', '.webp',
     '.heif', '.heic', '.cr2', '.nef', '.arw', '.orf', '.rw2', '.psd', '.ico', '.eps', '.pdf', '.ai', '.kra'];
 let imgMap = {};
-let totalImg = 0; 
+let totalImg = 0;
 const title = document.getElementById("home-title");
 const subtitle = document.getElementById("home-subtitle");
 const loadingSpinner = document.getElementById("loadingSpinner");
-let dirSize = 0;
-let openQ = false;
-let arr = [];
-
-class Queue {
-    constructor() {
-        this.items = {}
-        this.frontIndex = 0
-        this.backIndex = 0
-    }
-    enqueue(item) {
-        this.items[this.backIndex] = item
-        this.backIndex++
-        return item + ' inserted'
-    }
-    dequeue() {
-        const item = this.items[this.frontIndex]
-        delete this.items[this.frontIndex]
-        this.frontIndex++
-        return item
-    }
-    peek() {
-        return this.items[this.frontIndex]
-    }
-    isEmpty() {
-        return this.frontIndex === this.backIndex;
-    }
-    get printQueue() {
-        return this.items;
-    }
-}
-
-const q = new Queue();
 
 setDirBtn.addEventListener('click', () => {
 	ipcRenderer.send('select-dirs');
@@ -59,33 +25,26 @@ ipcRenderer.on('selected-directory', (event, paths) => {
     selectedDirElement.innerHTML = `<p>${paths}</p>`;
     boxContainer.style.display = 'flex';
     imgMap = {};
-    fastFolderSize(paths, (err, bytes) => {
-        if (err) {
-          throw err;
-        }
-        dirSize = bytes;
-    })
     // displayDuplicates();
     // hideNumDup();
 });
 
-ipcRenderer.on('hash-complete', (event, duplicates) => {
-    title.innerText = `Images checked: ${totalImg}\nDuplicates found: ${duplicates.length}`;
+findBtn.addEventListener('click', async () => {
+    console.log("clicked")
+	imgMap = {}
+    const dirToSearch = selectedDirElement.textContent.trim();
+    loading();
+    await Walk.walk(dirToSearch, walkFunc).then(function () {
+        console.log("Done");
+    });
+    // findDuplicates(dirToSearch)
+    const duplicates = Object.values(imgMap).filter(paths => paths.length > 1);
     localStorage.setItem('dups', JSON.stringify(duplicates));
     document.getElementById("loadingText").innerText = "Check complete!";
     document.getElementById("loadingText").style.color = "green";
     document.querySelector(".spinner").style.display = 'none';
     document.querySelector(".checkmark").style.display = 'flex';
     document.querySelector(".view-dups-container").style.display = 'flex';
-});
-
-findBtn.addEventListener('click', async () => {
-    const dirToSearch = selectedDirElement.textContent.trim();
-    loading();
-    await Walk.walk(dirToSearch, walkFunc).then(function () {
-        ipcRenderer.send("list-complete", arr);
-    });
-    // findDuplicates(dirToSearch)
 });
 
 viewDupsBtn.addEventListener('click', () => {
@@ -101,25 +60,59 @@ async function loading() {
     loadingSpinner.style.display = 'flex';
 }
 
-// function delay(milliseconds){
-//     return new Promise(resolve => {
-//         setTimeout(resolve, milliseconds);
-//     });
-// }
+function delay(milliseconds){
+    return new Promise(resolve => {
+        setTimeout(resolve, milliseconds);
+    });
+}
 
 async function walkFunc(err, pathname, dirent) {
     if (err) {
       return false;
     }
     if (!dirent.isDirectory() && !dirent.name.startsWith('.') && !dirent.name.startsWith('$')) {
+        console.log(pathname)
         const ext = path.extname(pathname).toLowerCase();
         if (imgFileTypes.includes(ext) && fileLocal(pathname)) {
             totalImg++;
-            q.enqueue(pathname);
-            arr.push(pathname);
+            title.innerText = `Images checked: ${totalImg}\nDuplicates found: ${(Object.values(imgMap).filter(paths => paths.length > 1)).length}`;
+            const hash = getFileHash(pathname);
+            if (hash) {
+                if (imgMap[hash]) {
+                    imgMap[hash].push(pathname);
+                } else {
+                    imgMap[hash] = [pathname];
+                }
+            }
         }
     }
 }
+
+// function findDuplicates(directory) {
+//     fs.readdir(directory, function(err, list) {
+//         list.forEach(file => {
+//             if(! /^\..*/.test(file)) {
+                // const fullPath = path.join(directory, file);
+                // if (isDir(fullPath)) {
+                //     findDuplicates(fullPath);
+                // } else {
+                //     const ext = path.extname(file).toLowerCase();
+                //     if (imgFileTypes.includes(ext) && fileLocal(fullPath)) {
+                //         const hash = getFileHash(fullPath);
+                //         if (hash) {
+                //             if (imgMap[hash]) {
+                //                 imgMap[hash].push(fullPath);
+                //             } else {
+                //                 imgMap[hash] = [fullPath];
+                //             }
+                //         }
+                //     }
+                // }
+//                 console.log(file)
+//             }
+//         });
+//     });
+// }
 
 function fileLocal(filePath) {
     try {

@@ -102,7 +102,7 @@ p {
 
 .img-thumbnail {
     max-width: 150px;
-    max-height: 150px;
+    max-height: 100px;
     width: auto;
     height: auto;
     object-fit: contain;
