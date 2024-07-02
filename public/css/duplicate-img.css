@@ -49,7 +49,7 @@ body {
     gap: 10px;
 }
 
-#next-img-btn, #finish-btn {
+#next-img-btn, #finish-btn, #next-img-btn-list, #finish-btn-list {
     align-self: flex-end;
     margin: 3rem .75rem .75rem 0;
     padding: 7px 12px;
@@ -76,14 +76,6 @@ body {
     flex-direction: row;
 }
 
-.dup-cards {
-    display: flex;
-    flex-direction: column;
-    text-align: start;
-    overflow-y: auto; 
-    height: 275px;
-    margin-left: 1rem;
-}
 
 ::-webkit-scrollbar {
     width: 8px;
@@ -106,22 +98,23 @@ body {
     background: #555; 
   }
 
-.dup-card {
+.detail-list, .dup-cards {
     width: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    margin: 0 auto;
     padding: 10px;
-    word-wrap: break-word;
     gap: 10px;
+    word-wrap: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+    text-align: start;
 }
 
-.img-content {
+.img-content, .dups-content-list {
     border-left: 2px #8b8b8b solid;
 }
 
-.img-paths {
+.img-paths, .img-group {
     font-size: small;
     cursor: pointer;
     color: #0056b3;
@@ -130,13 +123,19 @@ body {
     font-weight: 500;
 }
 
-.img-details {
+.img-details, .img-details-list {
     text-align: start;
     font-size: 14px;
     width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+.active {
+    background-color: #5ab5ffb4;
+    border-radius: 10px;
+    padding-left: 10px;
 }
 
 .img-thumbnail {
@@ -162,7 +161,7 @@ body {
 }
 
 .toggle-text {
-    margin-right: 1rem;
+    margin-right: .5rem;
     font-size: 16px;
     font-weight: bold;
     color: #333;
