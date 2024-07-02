@@ -44,8 +44,9 @@ toggleCheckbox.addEventListener('change', function() {
 
 function displayDuplicates() {
 	console.log(dups);
-    const dupCardsContainer = document.querySelector('.dup-cards');
-    dupCardsContainer.innerHTML = '';
+    const imgContent = document.querySelector('.img-details')
+    const dupCards = document.querySelector('.dup-cards');
+    dupCards.innerHTML = '';
 
     const card = document.createElement('div');
     card.classList.add('dup-card');
@@ -67,9 +68,27 @@ function displayDuplicates() {
     imgThumbnail.src = dups[0][0];
     imgThumbnail.className = 'img-thumbnail';
     imgThumbnail.addEventListener('click', () => showImage(dups[0][0]));
-    card.appendChild(imgThumbnail);
+    imgContent.appendChild(imgThumbnail);
 
-    dupCardsContainer.appendChild(card);
+    const imgDups = document.createElement('p');
+    imgDups.textContent = `Duplicates: ${dups[0].length}`;
+    imgDups.className = 'img-dups';
+    imgContent.appendChild(imgDups);
+
+    const imgType = document.createElement('p');
+    imgType.textContent = `File Type: ${path.extname(dups[0][0]).toUpperCase().substring(1)}`;
+    imgType.className = 'img-type';
+    imgContent.appendChild(imgType);
+
+    const imgSize = document.createElement('p');
+    var stats = fs.statSync(dups[0][0])
+    var fileSize = stats.size;
+    var fileSizeMB = Math.round((fileSize / (1024)) * 10) / 10;
+    imgSize.textContent = `Image Size: ${fileSizeMB} KB`;
+    imgSize.className = 'img-size';
+    imgContent.appendChild(imgSize);
+
+    dupCards.appendChild(card);
 }
 
 function displayNumDuplicates() {

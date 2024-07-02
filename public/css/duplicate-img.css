@@ -24,7 +24,6 @@ body {
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    padding: 20px;
     text-align: center;
 }
 
@@ -32,11 +31,16 @@ body {
     position: absolute;
     top: 20px;
     left: 20px;
-    padding: 5px 10px;
+    padding: 7px 12px;
     border-radius: 10px;
     background-color: white;
     cursor: pointer;
     border: 2px solid #000;
+}
+
+#back-btn:hover {
+    transition: background-color 0.3s ease;
+    background-color: #ccc;
 }
 
 .button-container {
@@ -46,7 +50,9 @@ body {
 }
 
 #next-img-btn, #finish-btn {
-    padding: 10px;
+    align-self: flex-end;
+    margin: 3rem .75rem .75rem 0;
+    padding: 7px 12px;
     border-radius: 10px;
     border: 2px solid #000;
     transition: background-color 0.3s ease, border 0.3s ease, color 0.3s ease;
@@ -59,35 +65,60 @@ body {
     border: 2px solid #0056b3;
 }
 
-h2 {
-    color: #333;
-    font-size: 28px;
-    margin: 15px 0;
+.num-dups {
+    width: 100%;
+    padding: 1rem 0 .5rem 0;
+    border-bottom: 2px #8b8b8b solid ;
 }
 
-p {
-    color: #666;
-    font-size: 16px;
-    margin: 20px 0;
+.dups-content {
+    display: flex;
+    flex-direction: row;
 }
 
 .dup-cards {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    text-align: start;
+    overflow-y: auto; 
+    height: 275px;
+    margin-left: 1rem;
 }
+
+::-webkit-scrollbar {
+    width: 8px;
+    padding-right: 2px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #ffffff; 
+  }
+   
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #888; 
+    border-radius: 15px;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+  }
 
 .dup-card {
     width: 100%;
-    border-radius: 15px;
-    align-items: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
     margin: 0 auto;
     padding: 10px;
-    margin-bottom: 10px;
     word-wrap: break-word;
+    gap: 10px;
+}
+
+.img-content {
+    border-left: 2px #8b8b8b solid;
 }
 
 .img-paths {
@@ -95,19 +126,30 @@ p {
     cursor: pointer;
     color: #0056b3;
     text-decoration: underline;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.img-details {
+    text-align: start;
+    font-size: 14px;
     width: 100%;
-    word-wrap: break-word; /* Ensure long words break and wrap to the next line */
-    white-space: normal;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .img-thumbnail {
-    max-width: 150px;
-    max-height: 100px;
-    width: auto;
-    height: auto;
+    width: 192px;
+    height: 108px;
     object-fit: contain;
     cursor: pointer;
-    border: 2px black solid;
+    align-self: center;
+    margin-bottom: .5rem;
+}
+
+.img-dups, .img-type, .img-size {
+    padding-left: .5rem;
 }
 
 /* toggle button styling */
