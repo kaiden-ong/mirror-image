@@ -6,7 +6,6 @@ const path = require('path');
 const backBtn = document.getElementById("back-btn");
 const nextBtn = document.getElementById("next-img-btn");
 const finishBtn = document.getElementById("finish-btn");
-const nextBtnList = document.getElementById("next-img-btn-list");
 const finishBtnList = document.getElementById("finish-btn-list");
 
 // toggle button
@@ -25,6 +24,11 @@ const imgContentList = document.querySelector('.img-details-list')
 const detailList = document.querySelector('.detail-list');
 let imgThumbnail, imgType, imgSize, imgDups
 
+// delete modal
+const modal = document.getElementById('deleteModal');
+const confirmDelete = document.getElementById('confirmDelete');
+const cancelDelete = document.getElementById('cancelDelete');
+
 let dups = {};
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -34,10 +38,8 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         if (dups.length > 1)  {
             nextBtn.style.display = 'flex';
-            nextBtnList.style.display = 'flex';
         } else {
             finishBtn.style.display = 'flex';
-            finishBtnList.style.display = 'flex';
         }
         displayDuplicates();
         displayNumDuplicates();
@@ -56,12 +58,6 @@ nextBtn.addEventListener('click', () => {
 
 finishBtn.addEventListener('click', () => {
     window.location.href = '../../index.html';
-})
-
-nextBtnList.addEventListener('click', () => {
-    dups.shift();
-    localStorage.setItem('dups', JSON.stringify(dups));
-    window.location.href = './duplicate-img.html';
 })
 
 finishBtnList.addEventListener('click', () => {
@@ -88,6 +84,12 @@ toggleCheckbox.addEventListener('change', function() {
         imgContentList.appendChild(imgSize);
     } else {
         document.querySelectorAll(".img-group").forEach(group => group.classList.remove("active"));
+        imgDups.textContent = `Duplicates: ${dups[0].length}`
+        imgType.textContent = `File Type: ${path.extname(dups[0][0]).toUpperCase().substring(1)}`;
+        var stats = fs.statSync(dups[0][0])
+        var fileSize = stats.size;
+        var fileSizeMB = Math.round((fileSize / (1024)) * 10) / 10;
+        imgSize.textContent = `Image Size: ${fileSizeMB} KB`;
         detailList.firstElementChild.classList.add("active")
         imgContent.appendChild(imgThumbnail);
         imgContent.appendChild(imgDups);
@@ -101,21 +103,26 @@ function displayDuplicates() {
     dupCards.innerHTML = '';
 
     dups[0].forEach(filePath => {
+        const pathCard = document.createElement('div');
+        pathCard.className = "path-card";
         const imgPath = document.createElement('p');
         imgPath.textContent = filePath.replace(/-/g, '\u2011').replace(/\\/g, '\u200B\\');
         imgPath.className = "img-paths";
         imgPath.addEventListener('click', () => openPath(filePath));
-        dupCards.appendChild(imgPath);
+        const trashBtnContainer = document.createElement('div');
+        trashBtnContainer.className = "trash-btn-container";
+        const trashBtn = document.createElement('button');
+        trashBtn.className = "trash-btn";
+        trashBtn.addEventListener('click', () => openDeleteModal(filePath));
+        trashBtnContainer.appendChild(trashBtn);
+        pathCard.appendChild(imgPath);
+        pathCard.appendChild(trashBtnContainer);
+        dupCards.appendChild(pathCard);
     });
-
-    const trashBtn = document.createElement('button');
-    trashBtn.className = "trash-btn";
-
-    dupCards.appendChild(trashBtn);
-
+    
     dups.forEach((filePaths, index) => {
         const imgGroup = document.createElement('p');
-        imgGroup.textContent = filePaths[0].replace(/-/g, '\u2011').replace(/\\/g, '\u200B\\') + `, ... + ${filePaths.length} more`;
+        imgGroup.textContent = filePaths[0].replace(/-/g, '\u2011').replace(/\\/g, '\u200B\\') + `, ... + ${filePaths.length - 1} more`;
         imgGroup.className = "img-group";
         if (index === 0) {
             imgGroup.classList.add('active');
@@ -124,6 +131,12 @@ function displayDuplicates() {
             document.querySelectorAll(".img-group").forEach(group => group.classList.remove("active"));
             imgGroup.classList.add("active");
             imgThumbnail.src = filePaths[0];
+            imgDups.textContent = `Duplicates: ${filePaths.length}`;
+            imgType.textContent = `File Type: ${path.extname(filePaths[0]).toUpperCase().substring(1)}`;
+            var stats = fs.statSync(filePaths[0])
+            var fileSize = stats.size;
+            var fileSizeMB = Math.round((fileSize / (1024)) * 10) / 10;
+            imgSize.textContent = `Image Size: ${fileSizeMB} KB`;
         });
         detailList.appendChild(imgGroup);
     })
@@ -158,6 +171,42 @@ function displayDuplicates() {
     imgContent.appendChild(imgDups);
     imgContent.appendChild(imgType);
     imgContent.appendChild(imgSize);
+}
+
+function openDeleteModal(filePath) {
+    modal.style.display = 'block';
+    confirmDelete.onclick = function() {
+        deleteConfirm(filePath);
+        modal.style.display = 'none';
+    }
+}
+
+cancelDelete.onclick = function() {
+    modal.style.display = 'none';
+}
+
+function deleteConfirm(path) {
+    fs.unlink(path, (err) => {
+        if (err) {
+            console.error(`Error deleting file: ${err}`);
+            return;
+        }
+        dups[0] = dups[0].filter(filePath => filePath !== path);
+        const pathCards = document.querySelectorAll('.path-card');
+        pathCards.forEach(card => {
+            const cardPath = card.querySelector('.img-paths').textContent;
+            if (cardPath === path.replace(/-/g, '\u2011').replace(/\\/g, '\u200B\\')) {
+                dupCards.removeChild(card);
+            }
+        });
+        imgDups.textContent = `Duplicates: ${dups[0].length}`;
+    });
+}
+
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = 'none';
+    }
 }
 
 function displayNumDuplicates() {
