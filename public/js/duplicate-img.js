@@ -58,6 +58,16 @@ finishBtn.addEventListener('click', () => {
     window.location.href = '../../index.html';
 })
 
+nextBtnList.addEventListener('click', () => {
+    dups.shift();
+    localStorage.setItem('dups', JSON.stringify(dups));
+    window.location.href = './duplicate-img.html';
+})
+
+finishBtnList.addEventListener('click', () => {
+    window.location.href = '../../index.html';
+})
+
 // todo
 toggleCheckbox.addEventListener('change', function() {
     const isChecked = this.checked;
@@ -70,6 +80,7 @@ toggleCheckbox.addEventListener('change', function() {
         singleView.style.display = 'flex';
         listView.style.display = 'none';
     }
+    imgThumbnail.src = dups[0][0];
     if (isChecked) {
         imgContentList.appendChild(imgThumbnail);
         imgContentList.appendChild(imgDups);
@@ -97,6 +108,11 @@ function displayDuplicates() {
         dupCards.appendChild(imgPath);
     });
 
+    const trashBtn = document.createElement('button');
+    trashBtn.className = "trash-btn";
+
+    dupCards.appendChild(trashBtn);
+
     dups.forEach((filePaths, index) => {
         const imgGroup = document.createElement('p');
         imgGroup.textContent = filePaths[0].replace(/-/g, '\u2011').replace(/\\/g, '\u200B\\') + `, ... + ${filePaths.length} more`;
@@ -107,6 +123,7 @@ function displayDuplicates() {
         imgGroup.addEventListener('click', () => {
             document.querySelectorAll(".img-group").forEach(group => group.classList.remove("active"));
             imgGroup.classList.add("active");
+            imgThumbnail.src = filePaths[0];
         });
         detailList.appendChild(imgGroup);
     })
