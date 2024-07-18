@@ -40,6 +40,7 @@ findBtn.addEventListener('click', async () => {
     // findDuplicates(dirToSearch)
     const duplicates = Object.values(imgMap).filter(paths => paths.length > 1);
     localStorage.setItem('dups', JSON.stringify(duplicates));
+    localStorage.setItem('index', 0);
     document.getElementById("loadingText").innerText = "Check complete!";
     document.getElementById("loadingText").style.color = "green";
     document.querySelector(".spinner").style.display = 'none';

@@ -30,13 +30,15 @@ const confirmDelete = document.getElementById('confirmDelete');
 const cancelDelete = document.getElementById('cancelDelete');
 
 let dups = {};
+let dupsIndex;
 
 document.addEventListener('DOMContentLoaded', function() {
     dups = JSON.parse(localStorage.getItem('dups'));
+    dupsIndex = localStorage.getItem('index');
     if (dups.length === 0) {
         numDupsDiv.innerText = "YAY! You have no duplicate images!!!";
     } else {
-        if (dups.length > 1)  {
+        if (dupsIndex < dups.length - 1)  {
             nextBtn.style.display = 'flex';
         } else {
             finishBtn.style.display = 'flex';
@@ -51,8 +53,8 @@ backBtn.addEventListener('click', () => {
 })
 
 nextBtn.addEventListener('click', () => {
-    dups.shift();
-    localStorage.setItem('dups', JSON.stringify(dups));
+    dupsIndex++;
+    localStorage.setItem('index', dupsIndex);
     window.location.href = './duplicate-img.html';
 })
 
@@ -76,21 +78,21 @@ toggleCheckbox.addEventListener('change', function() {
         singleView.style.display = 'flex';
         listView.style.display = 'none';
     }
-    imgThumbnail.src = dups[0][0];
+    imgThumbnail.src = dups[dupsIndex][0];
     if (isChecked) {
         imgContentList.appendChild(imgThumbnail);
         imgContentList.appendChild(imgDups);
         imgContentList.appendChild(imgType);
         imgContentList.appendChild(imgSize);
-    } else {
         document.querySelectorAll(".img-group").forEach(group => group.classList.remove("active"));
-        imgDups.textContent = `Duplicates: ${dups[0].length}`
-        imgType.textContent = `File Type: ${path.extname(dups[0][0]).toUpperCase().substring(1)}`;
-        var stats = fs.statSync(dups[0][0])
+        detailList.children[dupsIndex].classList.add("active");
+    } else {
+        imgDups.textContent = `Duplicates: ${dups[dupsIndex].length}`
+        imgType.textContent = `File Type: ${path.extname(dups[dupsIndex][0]).toUpperCase().substring(1)}`;
+        var stats = fs.statSync(dups[dupsIndex][0])
         var fileSize = stats.size;
         var fileSizeMB = Math.round((fileSize / (1024)) * 10) / 10;
         imgSize.textContent = `Image Size: ${fileSizeMB} KB`;
-        detailList.firstElementChild.classList.add("active")
         imgContent.appendChild(imgThumbnail);
         imgContent.appendChild(imgDups);
         imgContent.appendChild(imgType);
@@ -102,7 +104,7 @@ function displayDuplicates() {
 	console.log(dups);
     dupCards.innerHTML = '';
 
-    dups[0].forEach(filePath => {
+    dups[dupsIndex].forEach(filePath => {
         const pathCard = document.createElement('div');
         pathCard.className = "path-card";
         const imgPath = document.createElement('p');
@@ -124,7 +126,7 @@ function displayDuplicates() {
         const imgGroup = document.createElement('p');
         imgGroup.textContent = filePaths[0].replace(/-/g, '\u2011').replace(/\\/g, '\u200B\\') + `, ... + ${filePaths.length - 1} more`;
         imgGroup.className = "img-group";
-        if (index === 0) {
+        if (index === dupsIndex) {
             imgGroup.classList.add('active');
         }
         imgGroup.addEventListener('click', () => {
@@ -147,21 +149,21 @@ function displayDuplicates() {
     // viewButton.addEventListener('click', () => showImage(dups[0][0]));
     // card.appendChild(viewButton);
     imgThumbnail = document.createElement('img');
-    imgThumbnail.src = dups[0][0];
+    imgThumbnail.src = dups[dupsIndex][0];
     imgThumbnail.className = 'img-thumbnail';
-    imgThumbnail.addEventListener('click', () => showImage(dups[0][0]));
+    imgThumbnail.addEventListener('click', () => showImage(dups[dupsIndex][0]));
 
     imgDups = document.createElement('p');
-    imgDups.textContent = `Duplicates: ${dups[0].length}`;
+    imgDups.textContent = `Duplicates: ${dups[dupsIndex].length}`;
     imgDups.className = 'img-dups';
     
 
     imgType = document.createElement('p');
-    imgType.textContent = `File Type: ${path.extname(dups[0][0]).toUpperCase().substring(1)}`;
+    imgType.textContent = `File Type: ${path.extname(dups[dupsIndex][0]).toUpperCase().substring(1)}`;
     imgType.className = 'img-type';
 
     imgSize = document.createElement('p');
-    var stats = fs.statSync(dups[0][0])
+    var stats = fs.statSync(dups[dupsIndex][0])
     var fileSize = stats.size;
     var fileSizeMB = Math.round((fileSize / (1024)) * 10) / 10;
     imgSize.textContent = `Image Size: ${fileSizeMB} KB`;
@@ -191,7 +193,7 @@ function deleteConfirm(path) {
             console.error(`Error deleting file: ${err}`);
             return;
         }
-        dups[0] = dups[0].filter(filePath => filePath !== path);
+        dups[dupsIndex] = dups[dupsIndex].filter(filePath => filePath !== path);
         const pathCards = document.querySelectorAll('.path-card');
         pathCards.forEach(card => {
             const cardPath = card.querySelector('.img-paths').textContent;
@@ -199,7 +201,7 @@ function deleteConfirm(path) {
                 dupCards.removeChild(card);
             }
         });
-        imgDups.textContent = `Duplicates: ${dups[0].length}`;
+        imgDups.textContent = `Duplicates: ${dups[dupsIndex].length}`;
     });
 }
 
