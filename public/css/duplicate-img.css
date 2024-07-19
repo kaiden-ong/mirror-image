@@ -49,7 +49,7 @@ body {
     gap: 10px;
 }
 
-#next-img-btn, #finish-btn, #next-img-btn-list, #finish-btn-list {
+#next-img-btn, #finish-btn, #finish-btn-list {
     align-self: flex-end;
     margin: 3rem .75rem .75rem 0;
     padding: 7px 12px;
@@ -59,7 +59,17 @@ body {
     cursor: pointer;
 }
 
-#next-img-btn:hover, #finish-btn:hover, #next-img-btn-list:hover, #finish-btn-list:hover {
+#prev-img-btn {
+    align-self: flex-start;
+    margin-top: auto;
+    padding: 7px 12px;
+    border-radius: 10px;
+    border: 2px solid #000;
+    transition: background-color 0.3s ease, border 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+}
+
+#next-img-btn:hover, #prev-img-btn:hover, #finish-btn:hover, #finish-btn-list:hover {
     background-color: #0056b3;
     color: white;
     border: 2px solid #0056b3;

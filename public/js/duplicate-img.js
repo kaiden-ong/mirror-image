@@ -5,6 +5,7 @@ const path = require('path');
 // buttons
 const backBtn = document.getElementById("back-btn");
 const nextBtn = document.getElementById("next-img-btn");
+const prevBtn = document.getElementById("prev-img-btn");
 const finishBtn = document.getElementById("finish-btn");
 const finishBtnList = document.getElementById("finish-btn-list");
 
@@ -19,7 +20,7 @@ const listView = document.querySelector(".list-view");
 // box content
 const numDupsDiv = document.querySelector(".num-dups");
 const imgContent = document.querySelector('.img-details')
-const dupCards = document.querySelector('.dup-cards');
+const dupCards = document.querySelector('.dup-cards-list');
 const imgContentList = document.querySelector('.img-details-list')
 const detailList = document.querySelector('.detail-list');
 let imgThumbnail, imgType, imgSize, imgDups
@@ -43,6 +44,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             finishBtn.style.display = 'flex';
         }
+        if (dupsIndex != 0) {           
+            prevBtn.style.display = 'flex';
+        }
         displayDuplicates();
         displayNumDuplicates();
     }
@@ -54,6 +58,12 @@ backBtn.addEventListener('click', () => {
 
 nextBtn.addEventListener('click', () => {
     dupsIndex++;
+    localStorage.setItem('index', dupsIndex);
+    window.location.href = './duplicate-img.html';
+})
+
+prevBtn.addEventListener('click', () => {
+    dupsIndex--;
     localStorage.setItem('index', dupsIndex);
     window.location.href = './duplicate-img.html';
 })
@@ -212,7 +222,7 @@ window.onclick = function(event) {
 }
 
 function displayNumDuplicates() {
-	numDupsDiv.innerText = "Sets of duplicates images remaining: " + dups.length
+	numDupsDiv.innerText = "Set of duplicate images remaining: " + (dups.length - dupsIndex)
 }
 
 function showImage(filePath) {
