@@ -122,6 +122,10 @@ body {
     max-height: 275px;
 }
 
+.dup-cards-list {
+    flex-grow: 1;
+}
+
 .path-card {
     display: flex;
     justify-content: space-between;
